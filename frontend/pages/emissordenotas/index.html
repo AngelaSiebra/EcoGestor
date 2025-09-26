@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emissão de Notas - EcoGestor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&family=Montserrat:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --verde-floresta: #1B5E20;
+            --verde-claro: #66BB6A;
+            --azul-esmeralda: #00796B;
+            --marrom-terra: #4E342E;
+            --bege-areia: #FFF3E0;
+            --dourado: #FFC107;
+            --cinza-claro: #f5f5f5;
+            --cinza-escuro: #333;
+            --branco: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--cinza-escuro);
+            background-color: var(--cinza-claro);
+            line-height: 1.6;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: var(--verde-floresta);
+        }
+        
+        button {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background-color: var(--verde-floresta);
+            color: var(--branco);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .sidebar-logo {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-logo h2 {
+            color: var(--branco);
+            font-size: 24px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: rgba(255,255,255,0.1);
+            color: var(--branco);
+            border-left: 4px solid var(--dourado);
+        }
+        
+        .sidebar-menu .icon {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Topbar */
+        .topbar {
+            background-color: var(--branco);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .topbar-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--verde-floresta);
+            margin-right: 15px;
+        }
+        
+        .page-title {
+            font-size: 22px;
+            color: var(--verde-floresta);
+        }
+        
+        .topbar-search {
+            position: relative;
+            width: 300px;
+        }
+        
+        .topbar-search input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .topbar-search .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .topbar-actions .action-btn {
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .topbar-actions .action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--dourado);
+            color: var(--branco);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .topbar-actions .user-profile {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        
+        .topbar-actions .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--azul-esmeralda);
+            color: var(--branco);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        /* Emissão de Notas Page */
+        .invoice-page {
+            padding: 30px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-primary {
+            background-color: var(--verde-floresta);
+            color: var(--branco);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary:hover {
+            background-color: #124116;
+        }
+        
+        .btn-secondary {
+            background-color: var(--branco);
+            color: var(--verde-floresta);
+            border: 1px solid var(--verde-floresta);
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .btn-gold {
+            background-color: var(--dourado);
+            color: var(--marrom-terra);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+        
+        .btn-gold:hover {
+            background-color: #e6ac00;
+        }
+        
+        .invoice-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: var(--branco);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stat-title {
+            font-size: 16px;
+            color: #555;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--branco);
+        }
+        
+        .stat-icon.green {
+            background-color: var(--verde-claro);
+        }
+        
+        .stat-icon.blue {
+            background-color: var(--azul-esmeralda);
+        }
+        
+        .stat-icon.brown {
+            background-color: var(--marrom-terra);
+        }
+        
+        .stat-icon.gold {
+            background-color: var(--dourado);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-trend {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .stat-trend.positive {
+            color: var(--verde-claro);
+        }
+        
+        .stat-trend.negative {
+            color: #f44336;
+        }
+        
+        .invoice-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .content-section {
+            background-color: var(--branco);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .section-actions button {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .section-actions button:hover {
+            color: var(--verde-floresta);
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--verde-claro);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* Client Search */
+        .client-search {
+            position: relative;
+        }
+        
+        .client-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--branco);
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 10;
+            display: none;
+        }
+        
+        .client-result {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .client-result:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .client-result:last-child {
+            border-bottom: none;
+        }
+        
+        /* Products Table */
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .products-table th {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            color: #555;
+            background-color: #f9f9f9;
+        }
+        
+        .products-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .products-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .product-action {
+            background: none;
+            border: none;
+            color: #777;
+            font-size: 14px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .product-action:hover {
+            background-color: #f0f0f0;
+            color: var(--verde-floresta);
+        }
+        
+        .add-product-btn {
+            background-color: var(--bege-areia);
+            border: 1px dashed var(--marrom-terra);
+            color: var(--marrom-terra);
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .add-product-btn:hover {
+            background-color: #ffe9c9;
+        }
+        
+        /* Invoice Summary */
+        .invoice-summary {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .summary-total {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--verde-floresta);
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        
+        /* Integration Section */
+        .integration-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .integration-card {
+            background-color: var(--bege-areia);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .integration-card:hover {
+            background-color: #ffe9c9;
+            transform: translateY(-3px);
+        }
+        
+        .integration-card i {
+            font-size: 24px;
+            color: var(--marrom-terra);
+            margin-bottom: 10px;
+        }
+        
+        .integration-card span {
+            font-size: 14px;
+            font-weight: 500;
+            display: block;
+        }
+        
+        /* Recent Invoices */
+        .invoice-list {
+            list-style: none;
+        }
+        
+        .invoice-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .invoice-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bege-areia);
+            color: var(--marrom-terra);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .invoice-content {
+            flex: 1;
+        }
+        
+        .invoice-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .invoice-meta {
+            display: flex;
+            font-size: 13px;
+            color: #777;
+        }
+        
+        .invoice-date {
+            margin-right: 15px;
+        }
+        
+        .invoice-status {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .invoice-status.emitted {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .invoice-status.pending {
+            background-color: #fff8e1;
+            color: #f57f17;
+        }
+        
+        .invoice-status.canceled {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                overflow: hidden;
+            }
+            
+            .sidebar-logo {
+                padding: 0 10px 20px;
+                text-align: center;
+            }
+            
+            .sidebar-logo h2 {
+                display: none;
+            }
+            
+            .sidebar-menu a span {
+                display: none;
+            }
+            
+            .sidebar-menu a {
+                justify-content: center;
+                padding: 15px 0;
+            }
+            
+            .sidebar-menu .icon {
+                margin-right: 0;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .invoice-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 0 15px;
+            }
+            
+            .topbar-search {
+                width: 200px;
+            }
+            
+            .invoice-page {
+                padding: 20px 15px;
+            }
+            
+            .invoice-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .page-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 240px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .topbar-search {
+                display: none;
+            }
+            
+            .user-profile span {
+                display: none;
+            }
+            
+            .integration-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>EcoGestor</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#">
+                        <div class="icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span>Gestão de Vendas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="active">
+                        <div class="icon">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <span>Emissão de Nota</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <span>Agendamentos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <span>Gestão de Tarefas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <span>CRM e Contatos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <span>Financeiro</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <span>Configurações</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Emissão de Notas Fiscais</h1>
+                </div>
+                <div class="topbar-search">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <input type="text" placeholder="Pesquisar notas, clientes...">
+                </div>
+                <div class="topbar-actions">
+                    <button class="action-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">5</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                    <div class="user-profile">
+                        <div class="user-avatar">MV</div>
+                        <span>Maria Vendedora</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Emissão de Notas Page -->
+            <main class="invoice-page">
+                <div class="page-header">
+                    <h2>Emitir Nova Nota Fiscal</h2>
+                    <div class="page-actions">
+                        <button class="btn-primary">
+                            <i class="fas fa-save"></i> Salvar Rascunho
+                        </button>
+                        <button class="btn-gold">
+                            <i class="fas fa-file-export"></i> Emitir Nota
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Invoice Stats -->
+                <div class="invoice-stats">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3 class="stat-title">Notas Este Mês</h3>
+                            <div class="stat-icon green">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">42</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i> 8% em relação ao mês anterior
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3 class="stat-title">Valor Emitido</h3>
+                            <div class="stat-icon blue">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">R$ 58.240</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i> 15% acima da média
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3 class="stat-title">Pendentes</h3>
+                            <div class="stat-icon brown">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">5</div>
+                        <div class="stat-trend negative">
+                            <i class="fas fa-arrow-down"></i> 2 para vencer hoje
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3 class="stat-title">Canceladas</h3>
+                            <div class="stat-icon gold">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">3</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-down"></i> 50% menos que mês passado
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Content -->
+                <div class="invoice-content">
+                    <!-- Left Column -->
+                    <div class="left-column">
+                        <!-- Client Information -->
+                        <div class="content-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Dados do Cliente</h3>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="client-search">Buscar Cliente</label>
+                                <div class="client-search">
+                                    <input type="text" id="client-search" class="form-control" placeholder="Digite nome, CPF ou CNPJ">
+                                    <div class="client-results">
+                                        <!-- Results will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="client-name">Nome/Razão Social</label>
+                                    <input type="text" id="client-name" class="form-control" placeholder="Nome completo ou razão social">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="client-doc">CPF/CNPJ</label>
+                                    <input type="text" id="client-doc" class="form-control" placeholder="000.000.000-00 ou 00.000.000/0000-00">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="client-email">E-mail</label>
+                                <input type="email" id="client-email" class="form-control" placeholder="cliente@exemplo.com">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="client-phone">Telefone</label>
+                                    <input type="text" id="client-phone" class="form-control" placeholder="(00) 00000-0000">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="client-ie">Inscrição Estadual</label>
+                                    <input type="text" id="client-ie" class="form-control" placeholder="Opcional">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="client-address">Endereço</label>
+                                <input type="text" id="client-address" class="form-control" placeholder="Rua, número, complemento">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="client-city">Cidade</label>
+                                    <input type="text" id="client-city" class="form-control" placeholder="Cidade">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="client-state">Estado</label>
+                                    <select id="client-state" class="form-control">
+                                        <option value="">Selecione</option>
+                                        <option value="AC">Acre</option>
+                                        <option value="AL">Alagoas</option>
+                                        <option value="AP">Amapá</option>
+                                        <option value="AM">Amazonas</option>
+                                        <!-- More states would be listed -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Products/Services -->
+                        <div class="content-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Produtos/Serviços</h3>
+                                <div class="section-actions">
+                                    <button><i class="fas fa-plus"></i> Adicionar</button>
+                                </div>
+                            </div>
+                            
+                            <table class="products-table">
+                                <thead>
+                                    <tr>
+                                        <th>Descrição</th>
+                                        <th>Qtd</th>
+                                        <th>Valor Unit.</th>
+                                        <th>Total</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Consultoria Ambiental</td>
+                                        <td>1</td>
+                                        <td>R$ 1.500,00</td>
+                                        <td>R$ 1.500,00</td>
+                                        <td>
+                                            <div class="product-actions">
+                                                <button class="product-action"><i class="fas fa-edit"></i></button>
+                                                <button class="product-action"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Licença Ambiental</td>
+                                        <td>1</td>
+                                        <td>R$ 850,00</td>
+                                        <td>R$ 850,00</td>
+                                        <td>
+                                            <div class="product-actions">
+                                                <button class="product-action"><i class="fas fa-edit"></i></button>
+                                                <button class="product-action"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <button class="add-product-btn">
+                                <i class="fas fa-plus"></i> Adicionar Produto/Serviço
+                            </button>
+                            
+                            <div class="invoice-summary">
+                                <div class="summary-row">
+                                    <span>Subtotal:</span>
+                                    <span>R$ 2.350,00</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Desconto:</span>
+                                    <span>R$ 0,00</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Impostos:</span>
+                                    <span>R$ 423,00</span>
+                                </div>
+                                <div class="summary-row summary-total">
+                                    <span>Total:</span>
+                                    <span>R$ 2.773,00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="right-column">
+                        <!-- Invoice Details -->
+                        <div class="content-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Detalhes da Nota</h3>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="invoice-type">Tipo de Nota</label>
+                                    <select id="invoice-type" class="form-control">
+                                        <option value="nfe">NF-e (Nota Fiscal Eletrônica)</option>
+                                        <option value="nfse">NFS-e (Nota Fiscal de Serviços)</option>
+                                        <option value="nfc">NFC-e (Nota Fiscal ao Consumidor)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="invoice-number">Número da Nota</label>
+                                    <input type="text" id="invoice-number" class="form-control" value="Automático" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="invoice-date">Data de Emissão</label>
+                                    <input type="date" id="invoice-date" class="form-control" value="2023-06-15">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="invoice-due">Vencimento</label>
+                                    <input type="date" id="invoice-due" class="form-control" value="2023-07-15">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="invoice-notes">Observações</label>
+                                <textarea id="invoice-notes" class="form-control" rows="3" placeholder="Informações adicionais sobre a nota"></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button class="btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                                <button class="btn-primary">
+                                    <i class="fas fa-save"></i> Salvar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Integrations -->
+                        <div class="content-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Integrações Fiscais</h3>
+                            </div>
+                            
+                            <div class="integration-cards">
+                                <div class="integration-card">
+                                    <i class="fas fa-landmark"></i>
+                                    <span>Receita Federal</span>
+                                </div>
+                                <div class="integration-card">
+                                    <i class="fas fa-university"></i>
+                                    <span>Secretaria Estadual</span>
+                                </div>
+                                <div class="integration-card">
+                                    <i class="fas fa-city"></i>
+                                    <span>Prefeitura Municipal</span>
+                                </div>
+                                <div class="integration-card">
+                                    <i class="fas fa-search"></i>
+                                    <span>Consulta CNPJ/CPF</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions" style="margin-top: 20px;">
+                                <button class="btn-secondary" style="width: 100%;">
+                                    <i class="fas fa-sync-alt"></i> Sincronizar com Receita
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Recent Invoices -->
+                        <div class="content-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Notas Recentes</h3>
+                                <div class="section-actions">
+                                    <button><i class="fas fa-ellipsis-h"></i></button>
+                                </div>
+                            </div>
+                            <ul class="invoice-list">
+                                <li class="invoice-item">
+                                    <div class="invoice-icon">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </div>
+                                    <div class="invoice-content">
+                                        <div class="invoice-title">NF-e #001542 - Empresa ABC</div>
+                                        <div class="invoice-meta">
+                                            <span class="invoice-date">14/06/2023</span>
+                                            <span class="invoice-status emitted">Emitida</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="invoice-item">
+                                    <div 
